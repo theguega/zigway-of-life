@@ -1,0 +1,7 @@
+.{
+    .name = .zigway_game_life,
+    .version = "0.1.0",
+    .fingerprint = 0xb7e3987153885292,
+    .dependencies = .{},
+    .paths = .{""},
+}
