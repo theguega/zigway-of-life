@@ -12,7 +12,7 @@ const FPS = 10;
 pub fn main() !void {
     const seed: u64 = @bitCast(std.time.milliTimestamp());
     var prng = std.Random.DefaultPrng.init(seed);
-    var grid = Grid(COLS, ROWS).init(prng.random());
+    var grid = Grid(COLS, ROWS).initRandom(prng.random());
 
     rl.InitWindow(COLS * CELL, ROWS * CELL + 28, "Conway's Game of Life");
     rl.SetTargetFPS(FPS);
@@ -27,7 +27,7 @@ pub fn main() !void {
         if (rl.IsKeyPressed(rl.KEY_R)) {
             const new_seed: u64 = @bitCast(std.time.milliTimestamp());
             var new_prng = std.Random.DefaultPrng.init(new_seed);
-            grid = Grid(COLS, ROWS).init(new_prng.random());
+            grid = Grid(COLS, ROWS).initRandom(new_prng.random());
             gen = 0;
         }
         if (rl.IsKeyPressed(rl.KEY_C)) {

@@ -6,7 +6,7 @@ pub fn Grid(comptime W: usize, comptime H: usize) type {
 
         const Self = @This();
 
-        pub fn init(rng: std.Random) Self {
+        pub fn initRandom(rng: std.Random) Self {
             var self = Self{ .cells = [_][W]bool{[_]bool{false} ** W} ** H };
             for (0..H) |y| {
                 for (0..W) |x| {
@@ -45,6 +45,8 @@ pub fn Grid(comptime W: usize, comptime H: usize) type {
             for (0..H) |y| {
                 for (0..W) |x| {
                     const n = self.countNeighbors(x, y);
+                    // if a living cell has 2 or 3 neighbors -> stay alive; else die
+                    // if an empty cell has 3 neighbors -> become alive; else stay empty
                     next.cells[y][x] = if (self.cells[y][x]) n == 2 or n == 3 else n == 3;
                 }
             }

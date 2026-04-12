@@ -8,7 +8,7 @@ const TICK_MS = 100;
 pub fn main() !void {
     const seed: u64 = @bitCast(std.time.milliTimestamp());
     var prng = std.Random.DefaultPrng.init(seed);
-    var grid = Grid(W, H).init(prng.random());
+    var grid = Grid(W, H).initRandom(prng.random());
 
     var buf: [16384]u8 = undefined;
     var fw = std.fs.File.Writer.initStreaming(std.fs.File.stdout(), &buf);
@@ -17,7 +17,7 @@ pub fn main() !void {
     var gen: u64 = 0;
 
     try w.writeAll("\x1b[?25l"); // hide cursor
-    try w.writeAll("\x1b[2J");   // clear screen once
+    try w.writeAll("\x1b[2J"); // clear screen once
     defer {
         w.writeAll("\x1b[?25h") catch {}; // restore cursor
         w.flush() catch {};
