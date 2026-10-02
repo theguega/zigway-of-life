@@ -26,20 +26,26 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("src/raylib.zig"),
             .target = target,
             .optimize = optimize,
+            .link_libc = true,
         }),
     });
 
     // Use bundled raylib from ./raylib-5.5_macos/
-    raylib_exe.addIncludePath(b.path("raylib-5.5_macos/include"));
-    raylib_exe.addLibraryPath(b.path("raylib-5.5_macos/lib"));
-    raylib_exe.linkSystemLibrary("raylib");
-    raylib_exe.linkLibC();
+    const raylib_c = b.addTranslateC(.{
+        .root_source_file = b.path("raylib-5.5_macos/include/raylib.h"),
+        .target = target,
+        .optimize = optimize,
+    });
+    raylib_exe.root_module.addImport("raylib", raylib_c.createModule());
+    raylib_exe.root_module.addIncludePath(b.path("raylib-5.5_macos/include"));
+    raylib_exe.root_module.addLibraryPath(b.path("raylib-5.5_macos/lib"));
+    raylib_exe.root_module.linkSystemLibrary("raylib", .{ .use_pkg_config = .no });
 
     // macOS system frameworks required by raylib
-    raylib_exe.linkFramework("Cocoa");
-    raylib_exe.linkFramework("IOKit");
-    raylib_exe.linkFramework("CoreVideo");
-    raylib_exe.linkFramework("OpenGL");
+    raylib_exe.root_module.linkFramework("Cocoa", .{});
+    raylib_exe.root_module.linkFramework("IOKit", .{});
+    raylib_exe.root_module.linkFramework("CoreVideo", .{});
+    raylib_exe.root_module.linkFramework("OpenGL", .{});
 
     b.installArtifact(raylib_exe);
 

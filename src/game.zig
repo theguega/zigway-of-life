@@ -7,7 +7,7 @@ pub fn Grid(comptime W: usize, comptime H: usize) type {
         const Self = @This();
 
         pub fn initRandom(rng: std.Random) Self {
-            var self = Self{ .cells = [_][W]bool{[_]bool{false} ** W} ** H };
+            var self = Self{ .cells = @splat(@splat(false)) };
             for (0..H) |y| {
                 for (0..W) |x| {
                     self.cells[y][x] = rng.boolean();
@@ -17,7 +17,7 @@ pub fn Grid(comptime W: usize, comptime H: usize) type {
         }
 
         pub fn initEmpty() Self {
-            return .{ .cells = [_][W]bool{[_]bool{false} ** W} ** H };
+            return .{ .cells = @splat(@splat(false)) };
         }
 
         pub fn toggle(self: *Self, x: usize, y: usize) void {

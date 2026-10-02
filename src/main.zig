@@ -5,13 +5,14 @@ const W = 60;
 const H = 30;
 const TICK_MS = 100;
 
-pub fn main() !void {
-    const seed: u64 = @bitCast(std.time.milliTimestamp());
+pub fn main(init: std.process.Init) !void {
+    const io = init.io;
+    const seed: u64 = @bitCast(std.Io.Timestamp.now(io, .real).toMilliseconds());
     var prng = std.Random.DefaultPrng.init(seed);
     var grid = Grid(W, H).initRandom(prng.random());
 
     var buf: [16384]u8 = undefined;
-    var fw = std.fs.File.Writer.initStreaming(std.fs.File.stdout(), &buf);
+    var fw = std.Io.File.stdout().writerStreaming(io, &buf);
     const w = &fw.interface;
 
     var gen: u64 = 0;
@@ -38,6 +39,6 @@ pub fn main() !void {
 
         grid.step();
         gen += 1;
-        std.Thread.sleep(TICK_MS * std.time.ns_per_ms);
+        try io.sleep(.fromMilliseconds(TICK_MS), .awake);
     }
 }

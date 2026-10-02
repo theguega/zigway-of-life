@@ -1,7 +1,5 @@
 const std = @import("std");
-const rl = @cImport({
-    @cInclude("raylib.h");
-});
+const rl = @import("raylib");
 const Grid = @import("game.zig").Grid;
 
 const COLS = 80;
@@ -9,8 +7,9 @@ const ROWS = 50;
 const CELL = 12;
 const FPS = 10;
 
-pub fn main() !void {
-    const seed: u64 = @bitCast(std.time.milliTimestamp());
+pub fn main(init: std.process.Init) !void {
+    const io = init.io;
+    const seed: u64 = @bitCast(std.Io.Timestamp.now(io, .real).toMilliseconds());
     var prng = std.Random.DefaultPrng.init(seed);
     var grid = Grid(COLS, ROWS).initRandom(prng.random());
 
@@ -25,7 +24,7 @@ pub fn main() !void {
         // Controls
         if (rl.IsKeyPressed(rl.KEY_SPACE)) paused = !paused;
         if (rl.IsKeyPressed(rl.KEY_R)) {
-            const new_seed: u64 = @bitCast(std.time.milliTimestamp());
+            const new_seed: u64 = @bitCast(std.Io.Timestamp.now(io, .real).toMilliseconds());
             var new_prng = std.Random.DefaultPrng.init(new_seed);
             grid = Grid(COLS, ROWS).initRandom(new_prng.random());
             gen = 0;
@@ -81,7 +80,7 @@ pub fn main() !void {
         // HUD
         var buf: [64]u8 = undefined;
         const label = if (paused) "PAUSED" else "RUNNING";
-        const text = std.fmt.bufPrintZ(&buf, "Gen {d}  [{s}]  SPACE:pause R:reset C:clear", .{ gen, label }) catch "?";
+        const text = std.fmt.bufPrintSentinel(&buf, "Gen {d}  [{s}]  SPACE:pause R:reset C:clear", .{ gen, label }, 0) catch "?";
         rl.DrawText(text, 8, ROWS * CELL + 4, 16, rl.RAYWHITE);
 
         rl.EndDrawing();
